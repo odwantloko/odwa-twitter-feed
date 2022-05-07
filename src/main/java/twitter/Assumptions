@@ -1,0 +1,5 @@
+Assumptions made:
+1. The list of users that a person "follows" will always have a space after the comma e.g. "Ward follows Martin, Alan"
+2. No 2 users will have the same name spelling in the file. Username is assumed to be the id that links different classes/potential tables
+3. Processing time was too quick in milisecond to tell which tweet was create first, so I'm incrementing the time manually for the purpose of this assignment
+4. The system allows users to edit their tweets
