@@ -1,32 +1,13 @@
 package twitter;
 
-public class Person { //to do, make abstract
-    private String username; //acts as unique identifier
-    private String name;
+interface Person {
 
-    public Person(){
-    }
+    public void setUsername(String username);
 
-    public Person(String username, String name){
-        this.username = username;
-        this.name = name;
-    }
+    public void setName(String name);
 
-    public void setUsername(String username){
-        this.username = username;
-    }
+    public String getUsername();
 
-    public void setName(String name){
-        this.name = name;
-    }
-
-    public String getUsername(){
-        return this.username;
-    }
-
-    public String getName(){
-        return this.name;
-    }
-
+    public String getName();
 
 }

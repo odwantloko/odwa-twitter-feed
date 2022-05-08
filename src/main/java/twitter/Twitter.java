@@ -1,12 +1,28 @@
 package twitter;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
 
 
 public class Twitter {
-    public static Map<String, TwitterUser> processUserList(String[] userTxt){
+
+    // read textfiles
+    public static List<String> readFileInList(String fileName) throws IOException {
+        List<String> lines = new ArrayList<>();
+        try {
+            lines = Files.readAllLines(Paths.get(fileName), StandardCharsets.UTF_8);
+
+        } catch (IOException e) {
+            throw new IOException("\tERROR: An error occured while trying to read "+fileName+"!", e);
+        }
+        return lines;
+    }
+
+    // Create individual TwitterUser objects and return dataset with application users
+    public static Map<String, TwitterUser> processUsers(List<String> userTxt){
         Map<String, TwitterUser> applicationUsers = new HashMap<>();
 
         for (String line: userTxt){
@@ -43,7 +59,8 @@ public class Twitter {
         return applicationUsers;
     }
 
-    public static List<Tweet> processTweets(String[] tweets){
+    //Create Tweet objects and return dataset with all the tweets in the application
+    public static List<Tweet> processTweets(List<String> tweets){
         List<Tweet> applicationTweets = new ArrayList<>();
 
         int timeIncrement = 0; // time incrementer
@@ -61,6 +78,7 @@ public class Twitter {
         return applicationTweets;
     }
 
+    //Link all tweets to their TwitterUsers/Author who published them and returns the updated dataset of users
     public static Map<String, TwitterUser> linkTweetsToUser(List<Tweet> tweets, Map<String, TwitterUser> users){
         Map<String, TwitterUser> linkedUsers = users;
         for (Tweet tweet: tweets){
@@ -70,7 +88,8 @@ public class Twitter {
 
         return linkedUsers;
     }
-    //method sorts the data according to when they were posted/processed
+
+    //method sorts the data according to when they were posted/processed, helper method to ensure tweets are displayed in order
     public static List<Tweet> sortSingleUserFeedData(List<Tweet> unsortedTweets, List<Tweet> applicationTweets){
         List<Tweet> sortedTweets =  new ArrayList<>();
 
@@ -85,7 +104,7 @@ public class Twitter {
 
     }
 
-    //method returns the user's data sorted according to time processed/posted
+    //method returns a single TwitterUser's UserTwitterFeed that would be display to them only based on who they follow and their own posts
     public static UserTwitterFeed createSingleUserFeedData(TwitterUser user, List<Tweet> applicationTweets){
         List<Tweet> userVisibleTweets = new ArrayList<>();
 
@@ -105,45 +124,45 @@ public class Twitter {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         Map<String, TwitterUser> applicationUsers = new HashMap<>();
         List<Tweet> applicationTweets = new ArrayList<>();
         List<UserTwitterFeed> applicationFeeds = new ArrayList<>();
 
-        String userTxt[] = {
-                "Ward follows Alan",
-                "Alan follows Martin",
-                "Ward follows Martin, Steve, Alan"
-        };//read file 1
-        String tweets[] = {
-                "Alan> If you have a procedure with 10 parameters, you probably missed some."
-                , "Ward> There are only two hard things in Computer Science: cache invalidation, naming things and off-by-1 errors."
-                , "Steve> Fuck"
-                , "Alan> Random numbers should not be generated with a method chosen at random."
-        };//read file 2
+        List<String> userFileData =  new ArrayList<>();
+        List<String> tweetFileData =  new ArrayList<>();
+
 
         if (args.length < 2) {
-            System.out.println("Too little arguments provided. Please enter the user file name followed by the tweets file name separated by space");
-        }
+            System.out.println("An error occured - Too little arguments provided. Please enter the user file name followed by the tweets file name separated by space");
 
+        }else{
 
-        applicationUsers = processUserList(userTxt);
-        applicationTweets = processTweets(tweets);
+            try{
+                userFileData = readFileInList(args[0]);
+                tweetFileData = readFileInList(args[1]);
 
-        //link tweets to user:
-        applicationUsers = linkTweetsToUser(applicationTweets,applicationUsers);
+                applicationUsers = processUsers(userFileData);
+                applicationTweets = processTweets(tweetFileData);
 
+                applicationUsers = linkTweetsToUser(applicationTweets,applicationUsers); //link tweets to user:
 
-        // create application feeds
-        for(TwitterUser user: applicationUsers.values()){
-            applicationFeeds.add(createSingleUserFeedData(user, applicationTweets ));
-        }
+                for(TwitterUser user: applicationUsers.values()){ // create application user feeds
+                    applicationFeeds.add(createSingleUserFeedData(user, applicationTweets ));
+                }
 
-        // sort
-        Collections.sort(applicationFeeds);
-        //display fields
-        for(UserTwitterFeed feed: applicationFeeds){
-            displaySingleUserFeed(feed);
+                Collections.sort(applicationFeeds); //Sort users in alphabetical order
+
+                for(UserTwitterFeed feed: applicationFeeds){ //display fields
+                    displaySingleUserFeed(feed);
+                }
+
+            }catch (IOException e){
+                System.out.println(e);
+                System.out.println("Please ensure the file exists or you've typed the name correctly!");
+
+            }
+
         }
 
     }

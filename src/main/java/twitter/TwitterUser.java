@@ -2,20 +2,41 @@ package twitter;
 
 import java.util.*;
 
-public class TwitterUser extends Person{
+public class TwitterUser implements Person{
+    private String username;
+    private String name;
     private List<Tweet> postedTweets = new ArrayList<>();
     private Map<String, TwitterUser> followedUsers = new HashMap<>();
 
     public TwitterUser(){}
 
     public TwitterUser(String username, String name){
-        super(username, name);
+        this.username = username;
+        this.name = name;
     }
 
     public TwitterUser(String username, String name, List<Tweet> tweets, Map<String, TwitterUser> follows){
-        super(username, name);
+        this.username = username;
+        this.name = name;
         this.postedTweets = tweets;
         this.followedUsers = follows;
+    }
+
+    @Override
+    public void setUsername(String username){
+        this.username = username;
+    }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public String getUsername(){
+        return this.username;
+    }
+
+    public String getName(){
+        return this.name;
     }
 
     public void setPostedTweets(List<Tweet> tweets){

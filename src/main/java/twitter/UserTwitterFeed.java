@@ -1,7 +1,5 @@
 package twitter;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 public class UserTwitterFeed implements Comparable<UserTwitterFeed>{
@@ -18,7 +16,6 @@ public class UserTwitterFeed implements Comparable<UserTwitterFeed>{
         this.username = username;
         this.visibleTweets = tweets;
     }
-
     public void setUsername(String username){
         this.username = username;
     }
@@ -26,6 +23,7 @@ public class UserTwitterFeed implements Comparable<UserTwitterFeed>{
     public void setVisibleTweets(List<Tweet> tweets){
         this.visibleTweets = tweets;
     }
+
 
     public String getUsername(){
         return this.username;
@@ -43,7 +41,7 @@ public class UserTwitterFeed implements Comparable<UserTwitterFeed>{
 
 
     @Override
-    public int compareTo(@NotNull UserTwitterFeed o) {
+    public int compareTo(UserTwitterFeed o) {
         return this.getUsername().compareTo(o.getUsername());
     }
 }
