@@ -8,7 +8,9 @@ This is the repo for the twitter feed assignment.
 3. This application was built with openjdk version "17.0.3" 
 
 # How to run:
-enter the file names as command line arguments starting with the user file then the tweets file
+1. mvn clean
+2. mvn install
+3. enter the file names as command line arguments starting with the user file then the tweets file
 
 e.g. 
 user.txt tweet.txt
