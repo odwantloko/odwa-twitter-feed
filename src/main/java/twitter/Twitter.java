@@ -49,14 +49,19 @@ public class Twitter {
 
                 Map<String, TwitterUser> followings = new HashMap<>();
                 for(int i = 1; i < profile.length; i++){
-                    TwitterUser following = new TwitterUser(profile[i], profile[i]);
-                    if (!applicationUsers.containsKey(profile[i])){
+                    String usernameKey = profile[i];
+                    TwitterUser following; // user being followed
+                    if (!applicationUsers.containsKey(usernameKey)){
+                        following = new TwitterUser(usernameKey, usernameKey); // create new user
+                        applicationUsers.put(usernameKey,following);
+                        followings.put(usernameKey, following);
 
-                        applicationUsers.put(profile[i],following);
+                    }else{
+                        following = applicationUsers.get(usernameKey);
+                        followings.put(usernameKey,following); // add existing user
 
                     }
 
-                    followings.put(profile[i], following);
                 }
 
                 mainUser.setFollowedUsers(followings);
@@ -135,8 +140,8 @@ public class Twitter {
         List<Tweet> userVisibleTweets = new ArrayList<>();
 
         userVisibleTweets.addAll(user.getPostedTweets()); //add own tweets to feed
-        for(Map.Entry<String, TwitterUser> followed: user.getFollowedUsers().entrySet()){
-            userVisibleTweets.addAll(followed.getValue().getPostedTweets()); //add followed users tweets to feed
+        for(Map.Entry<String, TwitterUser> userEntry: user.getFollowedUsers().entrySet()){
+            userVisibleTweets.addAll(userEntry.getValue().getPostedTweets()); //add followed users tweets to feed
         }
 
         UserTwitterFeed CurrentUserFeed = new UserTwitterFeed(user.getUsername(), sortSingleUserFeedData(userVisibleTweets, applicationTweets));
@@ -160,7 +165,7 @@ public class Twitter {
 
 
         if (args.length < 2) {
-            System.out.println("An error occured - Too little arguments provided. Please enter the user file name followed by the tweets file name separated by space");
+            System.out.println("An error occured - Too little arguments provided. \nPlease enter the user filename followed by the tweets filename separated by a single space\ne.g. user.txt tweet.txt");
 
         }else{
 
@@ -172,12 +177,13 @@ public class Twitter {
                 applicationUsers = processUsers(userFileData);
                 applicationTweets = processTweets(tweetFileData);
 
-                if ( (applicationUsers.size() > 0) && (applicationTweets.size() > 0)){
-                    applicationUsers = linkTweetsToUser(applicationTweets,applicationUsers); //link tweets to user:
-                }
+                //if ( (applicationUsers.size() > 0)){
+
+                Map<String, TwitterUser>  usersWithTweets = linkTweetsToUser(applicationTweets,applicationUsers); //link tweets to user:
+                //}
 
 
-                for(TwitterUser user: applicationUsers.values()){ // create application user feeds
+                for(TwitterUser user: usersWithTweets.values()){ // create application user feeds
                     applicationFeeds.add(createSingleUserFeedData(user, applicationTweets ));
                 }
 
