@@ -55,7 +55,7 @@ public class TwitterUser implements Person{
         }
     }
 
-    public void addSingleFollowedUse(TwitterUser follows){
+    public void addSingleFollowedUser(TwitterUser follows){
         this.followedUsers.put(follows.getUsername(), follows);
     }
 

@@ -25,35 +25,46 @@ public class Twitter {
     public static Map<String, TwitterUser> processUsers(List<String> userTxt){
         Map<String, TwitterUser> applicationUsers = new HashMap<>();
 
-        for (String line: userTxt){
-            String formattedLine = line.replace(" follows",",");
-            String profile[] = formattedLine.split(", ");
+        String firstElement = ""; // first element used to check if the lines in the file are the correct structure
+        if (userTxt.size() > 0){
+            firstElement = userTxt.get(0);
+        }
 
-            String username = profile[0];
 
-            TwitterUser mainUser;
-            if (!applicationUsers.containsKey(username)){
-                mainUser = new TwitterUser(profile[0], profile[0]);
-                applicationUsers.put(mainUser.getUsername(),mainUser);
+        if ((userTxt.size() > 0) && firstElement.contains("follows")){
+            for (String line: userTxt){
+                String formattedLine = line.replace(" follows",",");
+                String profile[] = formattedLine.split(", ");
 
-            }else{
-                mainUser = applicationUsers.get(username);
-            }
+                String username = profile[0];
 
-            Map<String, TwitterUser> followings = new HashMap<>();
-            for(int i = 1; i < profile.length; i++){
-                TwitterUser following = new TwitterUser(profile[i], profile[i]);
-                if (!applicationUsers.containsKey(profile[i])){
+                TwitterUser mainUser;
+                if (!applicationUsers.containsKey(username)){
+                    mainUser = new TwitterUser(profile[0], profile[0]);
+                    applicationUsers.put(mainUser.getUsername(),mainUser);
 
-                    applicationUsers.put(profile[i],following);
-
+                }else{
+                    mainUser = applicationUsers.get(username);
                 }
 
-                followings.put(profile[i], following);
+                Map<String, TwitterUser> followings = new HashMap<>();
+                for(int i = 1; i < profile.length; i++){
+                    TwitterUser following = new TwitterUser(profile[i], profile[i]);
+                    if (!applicationUsers.containsKey(profile[i])){
+
+                        applicationUsers.put(profile[i],following);
+
+                    }
+
+                    followings.put(profile[i], following);
+                }
+
+                mainUser.setFollowedUsers(followings);
+
             }
 
-            mainUser.setFollowedUsers(followings);
-
+        }else{
+            System.out.println("The user file entered does not seem to have the correct contents. Please check the contents and retry the application. \nIf this is intentional, please feel free to ignore.");
         }
 
         return applicationUsers;
@@ -63,18 +74,28 @@ public class Twitter {
     public static List<Tweet> processTweets(List<String> tweets){
         List<Tweet> applicationTweets = new ArrayList<>();
 
-        int timeIncrement = 0; // time incrementer
-        for(String line: tweets){
-            String[] userTweet = line.split("> ");
-
-            Date now = new Date();
-            now.setTime(now.getTime()+timeIncrement);
-
-            Tweet tweet = new Tweet(userTweet[0], userTweet[1], now);
-            applicationTweets.add(tweet);
-
-            timeIncrement+=1000; // increment by 1 second
+        String firstElement = ""; // first element used to check if the lines in the file are the correct structure
+        if (tweets.size() > 0){
+            firstElement = tweets.get(0);
         }
+
+        if (tweets.size() > 0 && firstElement.contains(">")){
+            int timeIncrement = 0; // time incrementer
+            for(String line: tweets){
+                String[] userTweet = line.split("> ");
+
+                Date now = new Date();
+                now.setTime(now.getTime()+timeIncrement);
+
+                Tweet tweet = new Tweet(userTweet[0], userTweet[1], now);
+                applicationTweets.add(tweet);
+
+                timeIncrement+=1000; // increment by 1 second
+            }
+        } else {
+            System.out.println("The tweet file entered does not seem to have the correct contents/any tweets. Please check and retry the application. \nIf this was intended, please ignore this message.");
+        }
+
         return applicationTweets;
     }
 
@@ -82,8 +103,13 @@ public class Twitter {
     public static Map<String, TwitterUser> linkTweetsToUser(List<Tweet> tweets, Map<String, TwitterUser> users){
         Map<String, TwitterUser> linkedUsers = users;
         for (Tweet tweet: tweets){
-            TwitterUser tweetOwner = linkedUsers.get(tweet.getAuthorUsername());
-            tweetOwner.addToPostedTweets(tweet);
+            if (linkedUsers.get(tweet.getAuthorUsername()) != null){
+                TwitterUser tweetOwner = linkedUsers.get(tweet.getAuthorUsername());
+                tweetOwner.addToPostedTweets(tweet);
+            } else {
+                System.out.println("A tweet was created from a user that doesn't exist so it can't be displayed. Please check your input file and try again");
+            }
+
         }
 
         return linkedUsers;
@@ -139,21 +165,25 @@ public class Twitter {
         }else{
 
             try{
+                // file reading
                 userFileData = readFileInList(args[0]);
                 tweetFileData = readFileInList(args[1]);
 
                 applicationUsers = processUsers(userFileData);
                 applicationTweets = processTweets(tweetFileData);
 
-                applicationUsers = linkTweetsToUser(applicationTweets,applicationUsers); //link tweets to user:
+                if ( (applicationUsers.size() > 0) && (applicationTweets.size() > 0)){
+                    applicationUsers = linkTweetsToUser(applicationTweets,applicationUsers); //link tweets to user:
+                }
+
 
                 for(TwitterUser user: applicationUsers.values()){ // create application user feeds
                     applicationFeeds.add(createSingleUserFeedData(user, applicationTweets ));
                 }
 
-                Collections.sort(applicationFeeds); //Sort users in alphabetical order
+                Collections.sort(applicationFeeds); // Sorts users in alphabetical order
 
-                for(UserTwitterFeed feed: applicationFeeds){ //display fields
+                for(UserTwitterFeed feed: applicationFeeds){ //display feeds
                     displaySingleUserFeed(feed);
                 }
 
