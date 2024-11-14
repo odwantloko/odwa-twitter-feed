@@ -3,7 +3,7 @@ This is a repo for a twitter feed assignment I was given as part of a job interv
 
 This was because:
 - I was a java tutor in university so it was the programming language I felt the most comfortable with considering the limited time I had
-- I learnt all my DataStructures and algorithm courses in java so I knew the best data structures to use if I were to be asked to opmtomize the solution (which I was).
+- I learnt all my DataStructures and algorithm courses in java so I knew the best data structures to use if I were to be asked to optomize the solution (which I was).
 - Java just has a special place in my heart even though I have only used it for the first 2 years of my career. This is mainly due to some C & C++ university trauma lol!
 
 # To run this assignment the following prerequesites/recommendations apply:
